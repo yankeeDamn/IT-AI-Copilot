@@ -1,12 +1,12 @@
-# IT-AI-Copilot — Week 1
+# IT-AI-Copilot — Week 2
 
 A minimal Python ML backend that classifies IT helpdesk tickets into **network**, **account_access**, **hardware**, or **software**. No frontend or paid AI API required.
 
 ## Architecture
 
-- **Data:** 120 labeled synthetic tickets in `data/tickets.csv` (30 per class).
+- **Data:** 120 labeled synthetic tickets in `data/tickets_v2.csv` with 40 incident families (30 per class).
 - **Training:** Scikit-learn TF-IDF word and bigram features with balanced logistic regression.
-- **Evaluation:** 75/25 stratified split, deterministic seed 42; accuracy, macro-F1, per-class report and confusion matrix.
+- **Evaluation:** Group-aware 75/25 split, deterministic seed 42; accuracy, macro-F1, per-class report and confusion matrix.
 - **Serving:** FastAPI with model loaded once at startup; Docker image trains the model at build time.
 - **CI:** GitHub Actions lint, tests, training smoke test and Docker build.
 
@@ -14,18 +14,17 @@ A minimal Python ML backend that classifies IT helpdesk tickets into **network**
 
 ## Windows PowerShell — exact setup
 
-Install Python 3.12 and Git. Clone the repo and switch to its feature branch if not merged:
+Install Python 3.12 and Git. Clone the default branch after the PR is merged (while reviewing, switch to `feature/week2-ml-quality`):
 
 ```powershell
 git clone https://github.com/yankeeDamn/IT-AI-Copilot.git
 cd IT-AI-Copilot
-git switch feature/week1-ml-backend
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe scripts/train.py
+.\.venv\Scripts\python.exe scripts/{train,evaluate,validate_data}.py
 .\.venv\Scripts\python.exe -m uvicorn it_ai_copilot.api:app --reload
 ```
 
@@ -42,7 +41,7 @@ Invoke-RestMethod http://127.0.0.1:8000/health/live
 Invoke-RestMethod http://127.0.0.1:8000/health/ready
 ```
 
-The response includes `label`, `confidence`, `scores` and `model_version`. Confidence is the classifier's raw probability estimate, not calibrated reliability.
+The response includes `label`, `confidence`, `scores`, `needs_review` and `model_version`. The heuristic review flag is set for top-class score below 0.65. Scores are **not calibrated** and are not reliable probabilities. Do not automate high-impact actions from them.
 
 ## Docker
 
@@ -61,8 +60,8 @@ Visit http://localhost:8000/docs. The image runs as a non-root user and includes
 .github/workflows/ci.yml
 data/tickets.csv
 scripts/train.py
-src/it_ai_copilot/{__init__,model,api}.py
-tests/{test_api,test_model}.py
+src/it_ai_copilot/{__init__,model,api,evaluation}.py
+tests/{test_api,test_model,test_evaluation}.py
 Dockerfile
 pyproject.toml
 .env.example
@@ -83,3 +82,7 @@ Never load untrusted `.joblib` files: joblib uses pickle and can execute code wh
 ## Next milestone
 
 Improve the dataset and evaluation to avoid near-duplicate leakage, add an authenticated API, model versioning and monitoring, then deploy a private Azure Container App.
+
+## Week 2 evaluation
+
+Run `python scripts/validate_data.py` and `python scripts/evaluate.py`. The report `artifacts/evaluation_v2.json` contains the family-disjoint split, model comparison, per-class metrics, confusion matrices, model version, timestamp and SHA256 digests. CI uploads this report as a short-lived artifact. The deployed model remains logistic regression for API compatibility; Linear SVM is evaluated only. These synthetic data results do not establish production quality. Real-world datasets and calibrated confidence require separate work.
