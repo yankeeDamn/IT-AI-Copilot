@@ -1,25 +1,19 @@
-"""OIDC access-token validation and database-backed organization membership.
-
-Tokens must be signed by the configured issuer and contain an explicit audience.
-No unverified claims, dev bypass, or user-supplied organization header is trusted.
-"""
+"""Strict OIDC JWT verification with database-backed organization membership."""
 from __future__ import annotations
 
 import os
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
 from jwt import PyJWKClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from it_ai_copilot.store import Membership
 
-bearer = HTTPBearer(auto_error=False)
 ROLES = {"viewer", "technician", "admin"}
 
 
@@ -52,20 +46,11 @@ def verified_subject(token: str) -> str:
     subject = claims.get("sub")
     if not isinstance(subject, str) or not subject.strip():
         raise HTTPException(status_code=401, detail="Missing subject")
-    # Namespace subject by issuer to avoid collisions across identity providers.
     return f"{issuer}|{subject}"
 
 
-def current_principal(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
-    session: Annotated[Session, Depends(lambda: None)],
-):
-    # This placeholder dependency is overridden below by the database provider.
-    raise RuntimeError("Unconfigured principal dependency")
-
-
 def principal_for_session(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
+    credentials: HTTPAuthorizationCredentials | None,
     session: Session,
     organization_id: int,
 ) -> Principal:
