@@ -4,7 +4,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
@@ -92,7 +92,7 @@ def compare_and_train(data_path: Path, model_path: Path, report_path: Path) -> d
     sha = hashlib.sha256(model_path.read_bytes()).hexdigest()
     report = {
         "model_version": VERSION,
-        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "created_at_utc": datetime.now(UTC).isoformat(),
         "dataset_sha256": hashlib.sha256(data_path.read_bytes()).hexdigest(),
         "model_sha256": sha,
         "dataset_rows": len(rows),
