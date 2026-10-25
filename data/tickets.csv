@@ -1,0 +1,121 @@
+text,label
+WiFi disconnects every few minutes,network
+Helpdesk request: wifi disconnects every few minutes,network
+Please investigate: wifi disconnects every few minutes on my work device,network
+VPN fails during remote login,network
+Helpdesk request: vpn fails during remote login,network
+Please investigate: vpn fails during remote login on my work device,network
+Office network is unreachable,network
+Helpdesk request: office network is unreachable,network
+Please investigate: office network is unreachable on my work device,network
+DNS lookup fails for internal sites,network
+Helpdesk request: dns lookup fails for internal sites,network
+Please investigate: dns lookup fails for internal sites on my work device,network
+Internet latency is very high,network
+Helpdesk request: internet latency is very high,network
+Please investigate: internet latency is very high on my work device,network
+Ethernet connection drops frequently,network
+Helpdesk request: ethernet connection drops frequently,network
+Please investigate: ethernet connection drops frequently on my work device,network
+Cannot reach the company intranet,network
+Helpdesk request: cannot reach the company intranet,network
+Please investigate: cannot reach the company intranet on my work device,network
+Wireless access point rejects connection,network
+Helpdesk request: wireless access point rejects connection,network
+Please investigate: wireless access point rejects connection on my work device,network
+Remote desktop disconnects on VPN,network
+Helpdesk request: remote desktop disconnects on vpn,network
+Please investigate: remote desktop disconnects on vpn on my work device,network
+Network printer cannot be reached,network
+Helpdesk request: network printer cannot be reached,network
+Please investigate: network printer cannot be reached on my work device,network
+My password reset is not working,account_access
+Helpdesk request: my password reset is not working,account_access
+Please investigate: my password reset is not working on my work device,account_access
+Account is locked after login attempts,account_access
+Helpdesk request: account is locked after login attempts,account_access
+Please investigate: account is locked after login attempts on my work device,account_access
+MFA code is not being received,account_access
+Helpdesk request: mfa code is not being received,account_access
+Please investigate: mfa code is not being received on my work device,account_access
+Cannot sign in to company portal,account_access
+Helpdesk request: cannot sign in to company portal,account_access
+Please investigate: cannot sign in to company portal on my work device,account_access
+SSO authentication returns an error,account_access
+Helpdesk request: sso authentication returns an error,account_access
+Please investigate: sso authentication returns an error on my work device,account_access
+Need access to shared team folder,account_access
+Helpdesk request: need access to shared team folder,account_access
+Please investigate: need access to shared team folder on my work device,account_access
+My user permissions were removed,account_access
+Helpdesk request: my user permissions were removed,account_access
+Please investigate: my user permissions were removed on my work device,account_access
+Password has expired unexpectedly,account_access
+Helpdesk request: password has expired unexpectedly,account_access
+Please investigate: password has expired unexpectedly on my work device,account_access
+Authenticator app is not approving sign in,account_access
+Helpdesk request: authenticator app is not approving sign in,account_access
+Please investigate: authenticator app is not approving sign in on my work device,account_access
+Account disabled after leave,account_access
+Helpdesk request: account disabled after leave,account_access
+Please investigate: account disabled after leave on my work device,account_access
+Laptop battery no longer charges,hardware
+Helpdesk request: laptop battery no longer charges,hardware
+Please investigate: laptop battery no longer charges on my work device,hardware
+Monitor screen flickers intermittently,hardware
+Helpdesk request: monitor screen flickers intermittently,hardware
+Please investigate: monitor screen flickers intermittently on my work device,hardware
+Keyboard keys stopped responding,hardware
+Helpdesk request: keyboard keys stopped responding,hardware
+Please investigate: keyboard keys stopped responding on my work device,hardware
+Laptop overheats during meetings,hardware
+Helpdesk request: laptop overheats during meetings,hardware
+Please investigate: laptop overheats during meetings on my work device,hardware
+Docking station does not detect displays,hardware
+Helpdesk request: docking station does not detect displays,hardware
+Please investigate: docking station does not detect displays on my work device,hardware
+Desktop computer fails to power on,hardware
+Helpdesk request: desktop computer fails to power on,hardware
+Please investigate: desktop computer fails to power on on my work device,hardware
+Webcam is not detected by computer,hardware
+Helpdesk request: webcam is not detected by computer,hardware
+Please investigate: webcam is not detected by computer on my work device,hardware
+Headset microphone is broken,hardware
+Helpdesk request: headset microphone is broken,hardware
+Please investigate: headset microphone is broken on my work device,hardware
+Laptop fan makes a loud grinding noise,hardware
+Helpdesk request: laptop fan makes a loud grinding noise,hardware
+Please investigate: laptop fan makes a loud grinding noise on my work device,hardware
+External mouse disconnects randomly,hardware
+Helpdesk request: external mouse disconnects randomly,hardware
+Please investigate: external mouse disconnects randomly on my work device,hardware
+Spreadsheet application crashes on launch,software
+Helpdesk request: spreadsheet application crashes on launch,software
+Please investigate: spreadsheet application crashes on launch on my work device,software
+Email client freezes when opening,software
+Helpdesk request: email client freezes when opening,software
+Please investigate: email client freezes when opening on my work device,software
+Need to install approved accounting software,software
+Helpdesk request: need to install approved accounting software,software
+Please investigate: need to install approved accounting software on my work device,software
+Browser extension stops working,software
+Helpdesk request: browser extension stops working,software
+Please investigate: browser extension stops working on my work device,software
+Application update fails with an error,software
+Helpdesk request: application update fails with an error,software
+Please investigate: application update fails with an error on my work device,software
+Video meeting app closes unexpectedly,software
+Helpdesk request: video meeting app closes unexpectedly,software
+Please investigate: video meeting app closes unexpectedly on my work device,software
+PDF viewer cannot open documents,software
+Helpdesk request: pdf viewer cannot open documents,software
+Please investigate: pdf viewer cannot open documents on my work device,software
+Software license activation fails,software
+Helpdesk request: software license activation fails,software
+Please investigate: software license activation fails on my work device,software
+Desktop application shows a blank window,software
+Helpdesk request: desktop application shows a blank window,software
+Please investigate: desktop application shows a blank window on my work device,software
+The CRM app will not load reports,software
+Helpdesk request: the crm app will not load reports,software
+Please investigate: the crm app will not load reports on my work device,software
