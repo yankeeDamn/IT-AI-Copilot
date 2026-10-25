@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from it_ai_copilot.model import train
 
 if __name__ == "__main__":
