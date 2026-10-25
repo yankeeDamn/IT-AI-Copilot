@@ -7,7 +7,8 @@ from pathlib import Path
 import jwt
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from alembic import command
+from alembic.config import Config
 
 from it_ai_copilot.api import app
 from it_ai_copilot.evaluation import compare_and_train
@@ -47,6 +48,8 @@ def secured_client(tmp_path, monkeypatch):
         }, private_key, algorithm="RS256")
         return {"Authorization": f"Bearer {encoded}"}
 
+    config = Config("alembic.ini")
+    command.upgrade(config, "head")
     with TestClient(app) as client:
         with app.state.session_factory() as session:
             a = Organization(slug="org-a", name="Organization A")
