@@ -2,9 +2,9 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from it_ai_copilot import security
 from it_ai_copilot.api import app
 from it_ai_copilot.model import LABELS, train
-from it_ai_copilot import security
 
 
 def test_prediction_and_health(tmp_path, monkeypatch):
