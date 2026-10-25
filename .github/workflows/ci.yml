@@ -20,6 +20,10 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest -q
+      - name: Verify Alembic migration
+        run: |
+          DATABASE_URL=sqlite:////tmp/copilot-ci-migrate.db alembic upgrade head
+          DATABASE_URL=sqlite:////tmp/copilot-ci-migrate.db alembic current
       - name: Validate v2 dataset
         run: python scripts/validate_data.py
       - name: Grouped model evaluation
