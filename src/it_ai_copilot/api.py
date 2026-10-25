@@ -58,4 +58,9 @@ def predict(ticket: TicketRequest):
     label = str(classes[probabilities.argmax()])
     if label not in LABELS:
         raise HTTPException(status_code=500, detail="Invalid model output")
-    return PredictionResponse(\n        label=label,\n        confidence=scores[label],\n        scores=scores,\n        needs_review=scores[label] < 0.65,\n    )
+    return PredictionResponse(
+        label=label,
+        confidence=scores[label],
+        scores=scores,
+        needs_review=scores[label] < 0.65,
+    )
