@@ -86,3 +86,41 @@ Improve the dataset and evaluation to avoid near-duplicate leakage, add an authe
 ## Week 2 evaluation
 
 Run `python scripts/validate_data.py` and `python scripts/evaluate.py`. The report `artifacts/evaluation_v2.json` contains the family-disjoint split, model comparison, per-class metrics, confusion matrices, model version, timestamp and SHA256 digests. CI uploads this report as a short-lived artifact. The deployed model remains logistic regression for API compatibility; Linear SVM is evaluated only. These synthetic data results do not establish production quality. Real-world datasets and calibrated confidence require separate work.
+
+## IT Operations Copilot — backend MVP (follow-up PR)
+
+The MVP adds API-key-protected ticket management, assignment, priority and status updates, a
+summary endpoint, local TF-IDF document retrieval, optional Azure OpenAI suggestions, and
+**approval recording only** for allowlisted playbooks. No script execution or external ITSM
+integration is implemented. No frontend is included.
+
+Local PowerShell after installing dependencies and training:
+
+```powershell
+$env:COPILOT_API_KEY = "replace-with-a-long-random-secret"
+$env:DATABASE_URL = "sqlite:///./copilot.db"
+.\.venv\Scripts\python.exe -m uvicorn it_ai_copilot.api:app --reload
+$headers = @{ "x-api-key" = $env:COPILOT_API_KEY }
+$body = @{ title = "VPN issue"; description = "VPN disconnects frequently"; priority = "high" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/v1/tickets -Headers $headers -ContentType "application/json" -Body $body
+Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/dashboard/summary -Headers $headers
+```
+
+Endpoints: `POST/GET /v1/tickets`, `GET/PATCH /v1/tickets/{id}`,
+`POST /v1/tickets/{id}/classify`, `POST /v1/tickets/{id}/suggest`,
+`GET /v1/knowledge/search?q=...`, `GET /v1/dashboard/summary`,
+`POST /v1/tickets/{id}/automations`, `POST /v1/automations/{id}/approve`,
+`GET /v1/tickets/{id}/audit`.
+
+To enable Azure OpenAI, configure endpoint, deployment, and API key as environment variables.
+Keep secrets out of Git. The cloud call is optional; without configuration, the assistant
+returns a local retrieval fallback. Retrieved sources are examples, not verified operational policy.
+
+**Security limitations:** Single shared API key, no real user identity, no roles or tenants,
+no separate approver verification, no database migrations, no API rate limits, no document
+access control, no metrics for true classification accuracy, and no deployment configured.
+Approval is a database state transition and can be performed with the same API key used to
+request it. **Never expose this demo publicly or use it to run changes on real systems.**
+The dashboard is a JSON summary API, not a web UI. Before production: implement
+OIDC/SSO, per-tenant authorization, two-person approval, immutable audit infrastructure,
+Alembic migrations, encrypted managed database, observability and retention controls.
