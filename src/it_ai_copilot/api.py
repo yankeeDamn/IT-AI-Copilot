@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from it_ai_copilot.model import LABELS
+from it_ai_copilot.operations import router as operations_router
 
 
 class TicketRequest(BaseModel):
@@ -31,10 +32,16 @@ async def lifespan(app: FastAPI):
         raise RuntimeError(f"Model artifact missing: {path}. Run training first.")
     # joblib uses pickle: only load artifacts produced by trusted training pipelines.
     app.state.model = joblib.load(path)
+    from it_ai_copilot.store import session_factory
+
+    app.state.session_factory = session_factory()
     yield
 
 
-app = FastAPI(title="IT AI Copilot", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="IT AI Copilot", version="0.3.0", lifespan=lifespan)
+
+
+app.include_router(operations_router)
 
 
 @app.get("/health/live")
