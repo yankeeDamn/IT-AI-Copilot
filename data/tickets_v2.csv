@@ -1,0 +1,121 @@
+ticket_id,text,label,incident_family,source
+SYN-0001,WiFi disconnects every few minutes,network,network-01,synthetic
+SYN-0002,Helpdesk request: wifi disconnects every few minutes,network,network-01,synthetic
+SYN-0003,Please investigate: wifi disconnects every few minutes on my work device,network,network-01,synthetic
+SYN-0004,VPN fails during remote login,network,network-02,synthetic
+SYN-0005,Helpdesk request: vpn fails during remote login,network,network-02,synthetic
+SYN-0006,Please investigate: vpn fails during remote login on my work device,network,network-02,synthetic
+SYN-0007,Office network is unreachable,network,network-03,synthetic
+SYN-0008,Helpdesk request: office network is unreachable,network,network-03,synthetic
+SYN-0009,Please investigate: office network is unreachable on my work device,network,network-03,synthetic
+SYN-0010,DNS lookup fails for internal sites,network,network-04,synthetic
+SYN-0011,Helpdesk request: dns lookup fails for internal sites,network,network-04,synthetic
+SYN-0012,Please investigate: dns lookup fails for internal sites on my work device,network,network-04,synthetic
+SYN-0013,Internet latency is very high,network,network-05,synthetic
+SYN-0014,Helpdesk request: internet latency is very high,network,network-05,synthetic
+SYN-0015,Please investigate: internet latency is very high on my work device,network,network-05,synthetic
+SYN-0016,Ethernet connection drops frequently,network,network-06,synthetic
+SYN-0017,Helpdesk request: ethernet connection drops frequently,network,network-06,synthetic
+SYN-0018,Please investigate: ethernet connection drops frequently on my work device,network,network-06,synthetic
+SYN-0019,Cannot reach the company intranet,network,network-07,synthetic
+SYN-0020,Helpdesk request: cannot reach the company intranet,network,network-07,synthetic
+SYN-0021,Please investigate: cannot reach the company intranet on my work device,network,network-07,synthetic
+SYN-0022,Wireless access point rejects connection,network,network-08,synthetic
+SYN-0023,Helpdesk request: wireless access point rejects connection,network,network-08,synthetic
+SYN-0024,Please investigate: wireless access point rejects connection on my work device,network,network-08,synthetic
+SYN-0025,Remote desktop disconnects on VPN,network,network-09,synthetic
+SYN-0026,Helpdesk request: remote desktop disconnects on vpn,network,network-09,synthetic
+SYN-0027,Please investigate: remote desktop disconnects on vpn on my work device,network,network-09,synthetic
+SYN-0028,Network printer cannot be reached,network,network-10,synthetic
+SYN-0029,Helpdesk request: network printer cannot be reached,network,network-10,synthetic
+SYN-0030,Please investigate: network printer cannot be reached on my work device,network,network-10,synthetic
+SYN-0031,My password reset is not working,account_access,account_access-01,synthetic
+SYN-0032,Helpdesk request: my password reset is not working,account_access,account_access-01,synthetic
+SYN-0033,Please investigate: my password reset is not working on my work device,account_access,account_access-01,synthetic
+SYN-0034,Account is locked after login attempts,account_access,account_access-02,synthetic
+SYN-0035,Helpdesk request: account is locked after login attempts,account_access,account_access-02,synthetic
+SYN-0036,Please investigate: account is locked after login attempts on my work device,account_access,account_access-02,synthetic
+SYN-0037,MFA code is not being received,account_access,account_access-03,synthetic
+SYN-0038,Helpdesk request: mfa code is not being received,account_access,account_access-03,synthetic
+SYN-0039,Please investigate: mfa code is not being received on my work device,account_access,account_access-03,synthetic
+SYN-0040,Cannot sign in to company portal,account_access,account_access-04,synthetic
+SYN-0041,Helpdesk request: cannot sign in to company portal,account_access,account_access-04,synthetic
+SYN-0042,Please investigate: cannot sign in to company portal on my work device,account_access,account_access-04,synthetic
+SYN-0043,SSO authentication returns an error,account_access,account_access-05,synthetic
+SYN-0044,Helpdesk request: sso authentication returns an error,account_access,account_access-05,synthetic
+SYN-0045,Please investigate: sso authentication returns an error on my work device,account_access,account_access-05,synthetic
+SYN-0046,Need access to shared team folder,account_access,account_access-06,synthetic
+SYN-0047,Helpdesk request: need access to shared team folder,account_access,account_access-06,synthetic
+SYN-0048,Please investigate: need access to shared team folder on my work device,account_access,account_access-06,synthetic
+SYN-0049,My user permissions were removed,account_access,account_access-07,synthetic
+SYN-0050,Helpdesk request: my user permissions were removed,account_access,account_access-07,synthetic
+SYN-0051,Please investigate: my user permissions were removed on my work device,account_access,account_access-07,synthetic
+SYN-0052,Password has expired unexpectedly,account_access,account_access-08,synthetic
+SYN-0053,Helpdesk request: password has expired unexpectedly,account_access,account_access-08,synthetic
+SYN-0054,Please investigate: password has expired unexpectedly on my work device,account_access,account_access-08,synthetic
+SYN-0055,Authenticator app is not approving sign in,account_access,account_access-09,synthetic
+SYN-0056,Helpdesk request: authenticator app is not approving sign in,account_access,account_access-09,synthetic
+SYN-0057,Please investigate: authenticator app is not approving sign in on my work device,account_access,account_access-09,synthetic
+SYN-0058,Account disabled after leave,account_access,account_access-10,synthetic
+SYN-0059,Helpdesk request: account disabled after leave,account_access,account_access-10,synthetic
+SYN-0060,Please investigate: account disabled after leave on my work device,account_access,account_access-10,synthetic
+SYN-0061,Laptop battery no longer charges,hardware,hardware-01,synthetic
+SYN-0062,Helpdesk request: laptop battery no longer charges,hardware,hardware-01,synthetic
+SYN-0063,Please investigate: laptop battery no longer charges on my work device,hardware,hardware-01,synthetic
+SYN-0064,Monitor screen flickers intermittently,hardware,hardware-02,synthetic
+SYN-0065,Helpdesk request: monitor screen flickers intermittently,hardware,hardware-02,synthetic
+SYN-0066,Please investigate: monitor screen flickers intermittently on my work device,hardware,hardware-02,synthetic
+SYN-0067,Keyboard keys stopped responding,hardware,hardware-03,synthetic
+SYN-0068,Helpdesk request: keyboard keys stopped responding,hardware,hardware-03,synthetic
+SYN-0069,Please investigate: keyboard keys stopped responding on my work device,hardware,hardware-03,synthetic
+SYN-0070,Laptop overheats during meetings,hardware,hardware-04,synthetic
+SYN-0071,Helpdesk request: laptop overheats during meetings,hardware,hardware-04,synthetic
+SYN-0072,Please investigate: laptop overheats during meetings on my work device,hardware,hardware-04,synthetic
+SYN-0073,Docking station does not detect displays,hardware,hardware-05,synthetic
+SYN-0074,Helpdesk request: docking station does not detect displays,hardware,hardware-05,synthetic
+SYN-0075,Please investigate: docking station does not detect displays on my work device,hardware,hardware-05,synthetic
+SYN-0076,Desktop computer fails to power on,hardware,hardware-06,synthetic
+SYN-0077,Helpdesk request: desktop computer fails to power on,hardware,hardware-06,synthetic
+SYN-0078,Please investigate: desktop computer fails to power on on my work device,hardware,hardware-06,synthetic
+SYN-0079,Webcam is not detected by computer,hardware,hardware-07,synthetic
+SYN-0080,Helpdesk request: webcam is not detected by computer,hardware,hardware-07,synthetic
+SYN-0081,Please investigate: webcam is not detected by computer on my work device,hardware,hardware-07,synthetic
+SYN-0082,Headset microphone is broken,hardware,hardware-08,synthetic
+SYN-0083,Helpdesk request: headset microphone is broken,hardware,hardware-08,synthetic
+SYN-0084,Please investigate: headset microphone is broken on my work device,hardware,hardware-08,synthetic
+SYN-0085,Laptop fan makes a loud grinding noise,hardware,hardware-09,synthetic
+SYN-0086,Helpdesk request: laptop fan makes a loud grinding noise,hardware,hardware-09,synthetic
+SYN-0087,Please investigate: laptop fan makes a loud grinding noise on my work device,hardware,hardware-09,synthetic
+SYN-0088,External mouse disconnects randomly,hardware,hardware-10,synthetic
+SYN-0089,Helpdesk request: external mouse disconnects randomly,hardware,hardware-10,synthetic
+SYN-0090,Please investigate: external mouse disconnects randomly on my work device,hardware,hardware-10,synthetic
+SYN-0091,Spreadsheet application crashes on launch,software,software-01,synthetic
+SYN-0092,Helpdesk request: spreadsheet application crashes on launch,software,software-01,synthetic
+SYN-0093,Please investigate: spreadsheet application crashes on launch on my work device,software,software-01,synthetic
+SYN-0094,Email client freezes when opening,software,software-02,synthetic
+SYN-0095,Helpdesk request: email client freezes when opening,software,software-02,synthetic
+SYN-0096,Please investigate: email client freezes when opening on my work device,software,software-02,synthetic
+SYN-0097,Need to install approved accounting software,software,software-03,synthetic
+SYN-0098,Helpdesk request: need to install approved accounting software,software,software-03,synthetic
+SYN-0099,Please investigate: need to install approved accounting software on my work device,software,software-03,synthetic
+SYN-0100,Browser extension stops working,software,software-04,synthetic
+SYN-0101,Helpdesk request: browser extension stops working,software,software-04,synthetic
+SYN-0102,Please investigate: browser extension stops working on my work device,software,software-04,synthetic
+SYN-0103,Application update fails with an error,software,software-05,synthetic
+SYN-0104,Helpdesk request: application update fails with an error,software,software-05,synthetic
+SYN-0105,Please investigate: application update fails with an error on my work device,software,software-05,synthetic
+SYN-0106,Video meeting app closes unexpectedly,software,software-06,synthetic
+SYN-0107,Helpdesk request: video meeting app closes unexpectedly,software,software-06,synthetic
+SYN-0108,Please investigate: video meeting app closes unexpectedly on my work device,software,software-06,synthetic
+SYN-0109,PDF viewer cannot open documents,software,software-07,synthetic
+SYN-0110,Helpdesk request: pdf viewer cannot open documents,software,software-07,synthetic
+SYN-0111,Please investigate: pdf viewer cannot open documents on my work device,software,software-07,synthetic
+SYN-0112,Software license activation fails,software,software-08,synthetic
+SYN-0113,Helpdesk request: software license activation fails,software,software-08,synthetic
+SYN-0114,Please investigate: software license activation fails on my work device,software,software-08,synthetic
+SYN-0115,Desktop application shows a blank window,software,software-09,synthetic
+SYN-0116,Helpdesk request: desktop application shows a blank window,software,software-09,synthetic
+SYN-0117,Please investigate: desktop application shows a blank window on my work device,software,software-09,synthetic
+SYN-0118,The CRM app will not load reports,software,software-10,synthetic
+SYN-0119,Helpdesk request: the crm app will not load reports,software,software-10,synthetic
+SYN-0120,Please investigate: the crm app will not load reports on my work device,software,software-10,synthetic
