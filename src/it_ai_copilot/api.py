@@ -20,7 +20,8 @@ class PredictionResponse(BaseModel):
     label: str
     confidence: float
     scores: dict[str, float]
-    model_version: str = "0.1.0"
+    model_version: str = "0.2.0"
+    needs_review: bool = False
 
 
 @asynccontextmanager
@@ -33,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="IT AI Copilot", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="IT AI Copilot", version="0.2.0", lifespan=lifespan)
 
 
 @app.get("/health/live")
@@ -57,4 +58,4 @@ def predict(ticket: TicketRequest):
     label = str(classes[probabilities.argmax()])
     if label not in LABELS:
         raise HTTPException(status_code=500, detail="Invalid model output")
-    return PredictionResponse(label=label, confidence=scores[label], scores=scores)
+    return PredictionResponse(\n        label=label,\n        confidence=scores[label],\n        scores=scores,\n        needs_review=scores[label] < 0.65,\n    )
