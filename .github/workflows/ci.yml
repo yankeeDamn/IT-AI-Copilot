@@ -7,6 +7,20 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: copilot_ci
+          POSTGRES_USER: copilot
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U copilot -d copilot_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,6 +40,12 @@ jobs:
           DATABASE_URL=sqlite:////tmp/copilot-ci-migrate.db alembic current
       - name: Validate v2 dataset
         run: python scripts/validate_data.py
+      - name: PostgreSQL migration smoke test
+        env:
+          DATABASE_URL: postgresql+psycopg://copilot:ci-only-password@127.0.0.1:5432/copilot_ci
+        run: |
+          alembic upgrade head
+          alembic current
       - name: Grouped model evaluation
         run: python scripts/evaluate.py
       - name: Train smoke test
