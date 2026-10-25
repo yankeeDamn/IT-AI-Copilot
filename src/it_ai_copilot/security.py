@@ -7,7 +7,7 @@ from functools import lru_cache
 
 import jwt
 from fastapi import HTTPException
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from it_ai_copilot.store import Membership
 
 ROLES = {"viewer", "technician", "admin"}
+bearer = HTTPBearer(auto_error=False)
 
 
 @dataclass(frozen=True)
