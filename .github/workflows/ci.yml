@@ -20,7 +20,17 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest -q
+      - name: Validate v2 dataset
+        run: python scripts/validate_data.py
+      - name: Grouped model evaluation
+        run: python scripts/evaluate.py
       - name: Train smoke test
         run: python scripts/train.py
+      - name: Upload evaluation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: grouped-evaluation
+          path: artifacts/evaluation_v2.json
+          retention-days: 7
       - name: Docker build
         run: docker build -t it-ai-copilot:ci .
