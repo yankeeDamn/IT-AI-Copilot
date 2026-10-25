@@ -6,14 +6,14 @@ from pathlib import Path
 
 import jwt
 import pytest
-from fastapi.testclient import TestClient
 from alembic import command
 from alembic.config import Config
+from fastapi.testclient import TestClient
 
+from it_ai_copilot import security
 from it_ai_copilot.api import app
 from it_ai_copilot.evaluation import compare_and_train
 from it_ai_copilot.store import Membership, Organization
-from it_ai_copilot import security
 
 
 @pytest.fixture
@@ -102,7 +102,7 @@ def test_tenant_isolation_and_separate_approval(secured_client):
 
 
 def test_unsigned_or_wrong_audience_rejected(secured_client):
-    client, token, org, _ = secured_client
+    client, _token, org, _ = secured_client
     path = f"/v1/organizations/{org}/tickets"
     assert client.get(path, headers={"Authorization": "Bearer fake"}).status_code == 401
     assert client.get(path, headers={"Authorization": "Bearer " + jwt.encode({
