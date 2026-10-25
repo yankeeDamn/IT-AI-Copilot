@@ -4,16 +4,16 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Annotated
 
 import joblib
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from it_ai_copilot.model import LABELS
 from it_ai_copilot.operations import router as operations_router
 from it_ai_copilot.security import verified_subject
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Annotated
 
 
 class TicketRequest(BaseModel):
