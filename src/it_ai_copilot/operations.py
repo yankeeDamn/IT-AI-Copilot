@@ -4,6 +4,8 @@ Development auth is a single API key, not tenant-aware identity. Do not expose p
 """
 from __future__ import annotations
 
+from typing import Annotated
+
 import hmac
 import os
 from datetime import UTC, datetime
@@ -76,7 +78,7 @@ def serialize(ticket: Ticket) -> dict:
 
 
 @router.post("/tickets", status_code=201)
-def create_ticket(payload: TicketCreate, who: str = Depends(actor), session: Session = Depends(db)):
+def create_ticket(payload: TicketCreate, who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     if payload.priority not in PRIORITIES:
         raise HTTPException(status_code=422, detail="Invalid priority")
     ticket = Ticket(title=payload.title, description=payload.description, priority=payload.priority)
@@ -88,19 +90,19 @@ def create_ticket(payload: TicketCreate, who: str = Depends(actor), session: Ses
 
 
 @router.get("/tickets")
-def list_tickets(who: str = Depends(actor), session: Session = Depends(db)):
+def list_tickets(who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     tickets = session.scalars(select(Ticket).order_by(Ticket.id.desc()).limit(100)).all()
     return [serialize(t) for t in tickets]
 
 
 @router.get("/tickets/{ticket_id}")
-def ticket_detail(ticket_id: int, who: str = Depends(actor), session: Session = Depends(db)):
+def ticket_detail(ticket_id: int, who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     return serialize(get_ticket(session, ticket_id))
 
 
 @router.patch("/tickets/{ticket_id}")
-def update_ticket(ticket_id: int, payload: TicketUpdate, who: str = Depends(actor),
-                  session: Session = Depends(db)):
+def update_ticket(ticket_id: int, payload: TicketUpdate, who: Annotated[str, Depends(actor)],
+                  session: Annotated[Session, Depends(db)]):
     ticket = get_ticket(session, ticket_id)
     changes = payload.model_dump(exclude_unset=True)
     if "status" in changes and changes["status"] not in STATUSES:
@@ -117,7 +119,7 @@ def update_ticket(ticket_id: int, payload: TicketUpdate, who: str = Depends(acto
 
 
 @router.post("/tickets/{ticket_id}/classify")
-def classify_ticket(ticket_id: int, who: str = Depends(actor), session: Session = Depends(db)):
+def classify_ticket(ticket_id: int, who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     from it_ai_copilot.api import app
 
     ticket = get_ticket(session, ticket_id)
@@ -136,12 +138,12 @@ def classify_ticket(ticket_id: int, who: str = Depends(actor), session: Session 
 
 
 @router.get("/knowledge/search")
-def knowledge_search(q: str, who: str = Depends(actor)):
+def knowledge_search(q: str, who: Annotated[str, Depends(actor)]):
     return search_knowledge(q, Path(os.environ.get("KNOWLEDGE_DIR", "knowledge")))
 
 
 @router.post("/tickets/{ticket_id}/suggest")
-async def suggest(ticket_id: int, who: str = Depends(actor), session: Session = Depends(db)):
+async def suggest(ticket_id: int, who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     ticket = get_ticket(session, ticket_id)
     sources = search_knowledge(ticket.description, Path(os.environ.get("KNOWLEDGE_DIR", "knowledge")))
     answer = await suggest_resolution(ticket.description, sources)
@@ -151,7 +153,7 @@ async def suggest(ticket_id: int, who: str = Depends(actor), session: Session = 
 
 
 @router.get("/dashboard/summary")
-def dashboard_summary(who: str = Depends(actor), session: Session = Depends(db)):
+def dashboard_summary(who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     status_rows = session.execute(select(Ticket.status, func.count()).group_by(Ticket.status)).all()
     category_rows = session.execute(select(Ticket.category, func.count()).group_by(Ticket.category)).all()
     resolution_hours = [
@@ -167,7 +169,7 @@ def dashboard_summary(who: str = Depends(actor), session: Session = Depends(db))
 
 @router.post("/tickets/{ticket_id}/automations", status_code=201)
 def request_automation(ticket_id: int, payload: AutomationCreate,
-                       who: str = Depends(actor), session: Session = Depends(db)):
+                       who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     get_ticket(session, ticket_id)
     if payload.playbook not in PLAYBOOKS:
         raise HTTPException(status_code=422, detail="Unsupported playbook")
@@ -180,8 +182,8 @@ def request_automation(ticket_id: int, payload: AutomationCreate,
 
 
 @router.post("/automations/{request_id}/approve")
-def approve_automation(request_id: int, who: str = Depends(actor),
-                       session: Session = Depends(db)):
+def approve_automation(request_id: int, who: Annotated[str, Depends(actor)],
+                       session: Annotated[Session, Depends(db)]):
     request = session.get(AutomationRequest, request_id)
     if request is None:
         raise HTTPException(status_code=404, detail="Request not found")
@@ -196,7 +198,7 @@ def approve_automation(request_id: int, who: str = Depends(actor),
 
 
 @router.get("/tickets/{ticket_id}/audit")
-def audit(ticket_id: int, who: str = Depends(actor), session: Session = Depends(db)):
+def audit(ticket_id: int, who: Annotated[str, Depends(actor)], session: Annotated[Session, Depends(db)]):
     get_ticket(session, ticket_id)
     events = session.scalars(select(AuditEvent).where(AuditEvent.ticket_id == ticket_id)
                              .order_by(AuditEvent.id.desc())).all()
