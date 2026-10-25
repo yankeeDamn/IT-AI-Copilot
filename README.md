@@ -1,126 +1,87 @@
-# IT-AI-Copilot — Week 2
+# IT-AI-Copilot — Week 4 Secure Backend
 
-A minimal Python ML backend that classifies IT helpdesk tickets into **network**, **account_access**, **hardware**, or **software**. No frontend or paid AI API required.
+Python IT Operations Copilot: ML ticket classification, OIDC-protected ticket management,
+tenant-isolated PostgreSQL persistence, knowledge search, optional Azure OpenAI suggestions,
+and separate-person automation approval **recording only**.
 
-## Architecture
+## Architecture and security
 
-- **Data:** 120 labeled synthetic tickets in `data/tickets_v2.csv` with 40 incident families (30 per class).
-- **Training:** Scikit-learn TF-IDF word and bigram features with balanced logistic regression.
-- **Evaluation:** Group-aware 75/25 split, deterministic seed 42; accuracy, macro-F1, per-class report and confusion matrix.
-- **Serving:** FastAPI with model loaded once at startup; Docker image trains the model at build time.
-- **CI:** GitHub Actions lint, tests, training smoke test and Docker build.
+- **Authentication:** HTTPS OIDC issuer, RS256 JWT, JWKS signature verification, issuer,
+  audience, expiration and required claims; bearer tokens are not API keys.
+- **Authorization:** Database-backed memberships with viewer, technician, admin roles.
+  Every ticket, dashboard and audit query is scoped to the authenticated organization.
+- **Automation:** A technician or admin may request an allowlisted playbook. A *different*
+  admin in the same organization must approve it. No script execution is implemented.
+- **Persistence:** SQLAlchemy + Alembic, PostgreSQL through psycopg 3. SQLite is used in
+  isolated automated tests. Existing Week 3 SQLite databases are **not automatically migrated**.
+- **ML:** Synthetic-ticket model with group-aware holdout; uncalibrated confidence.
+- **AI:** Azure OpenAI is optional. Do not send sensitive production tickets without approved
+  privacy controls. Knowledge files are bundled demonstration articles only.
 
-> This synthetic dataset deliberately contains templated variants of the same issue. Held-out metrics may be optimistic because related variants can appear in both train and test. Do not claim production accuracy. For real-world evaluation, collect permissioned, de-identified tickets and split by incident family or time.
+## Windows PowerShell local setup
 
-## Windows PowerShell — exact setup
-
-Install Python 3.12 and Git. Clone the default branch after the PR is merged (while reviewing, switch to `feature/week2-ml-quality`):
+Install Python 3.12, Git and Docker Desktop. From the project folder:
 
 ```powershell
-git clone https://github.com/yankeeDamn/IT-AI-Copilot.git
-cd IT-AI-Copilot
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+$env:POSTGRES_PASSWORD = "choose-a-local-password"
+docker compose up -d postgres
+$env:DATABASE_URL = "postgresql+psycopg://copilot:choose-a-local-password@127.0.0.1:5432/copilot"
+.\.venv\Scripts\alembic.exe upgrade head
+.\.venv\Scripts\python.exe scripts/train.py
 .\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe scripts/{train,evaluate,validate_data}.py
 .\.venv\Scripts\python.exe -m uvicorn it_ai_copilot.api:app --reload
 ```
 
-Open http://127.0.0.1:8000/docs and use the interactive API. A trained artifact must exist before API startup.
+Set `OIDC_ISSUER`, `OIDC_AUDIENCE`, and `OIDC_JWKS_URI` to a configured identity
+provider that issues **RS256 API access tokens** for the intended audience. An identity
+provider must be configured separately; no hosted login UI is included. An OIDC *ID token*
+is not a substitute for an API access token. The API fails closed without OIDC configuration.
 
-## Test a prediction
-
-In a second PowerShell window:
-
-```powershell
-$body = @{ text = "My VPN connection keeps dropping" } | ConvertTo-Json
-Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/predict -Method Post -ContentType "application/json" -Body $body
-Invoke-RestMethod http://127.0.0.1:8000/health/live
-Invoke-RestMethod http://127.0.0.1:8000/health/ready
-```
-
-The response includes `label`, `confidence`, `scores`, `needs_review` and `model_version`. The heuristic review flag is set for top-class score below 0.65. Scores are **not calibrated** and are not reliable probabilities. Do not automate high-impact actions from them.
-
-## Docker
-
-With Docker Desktop running:
+Provision the initial admin with a trusted, issuer-prefixed subject obtained from the
+provider, not from arbitrary client input:
 
 ```powershell
-docker build -t it-ai-copilot:week1 .
-docker run --rm -p 8000:8000 it-ai-copilot:week1
+.\.venv\Scripts\python.exe scripts/bootstrap_org.py --slug demo --name "Demo IT" --subject "https://your-issuer|actual-sub"
 ```
 
-Visit http://localhost:8000/docs. The image runs as a non-root user and includes a health check.
+Read the printed organization ID and call `/v1/organizations/{organization_id}/tickets`
+with `Authorization: Bearer <access_token>`. Swagger docs: http://127.0.0.1:8000/docs.
+Membership management for other users is not yet exposed through an API: provision
+membership records through a trusted administrative process.
 
-## Repository
+## API and tests
 
-```text
-.github/workflows/ci.yml
-data/tickets.csv
-scripts/train.py
-src/it_ai_copilot/{__init__,model,api,evaluation}.py
-tests/{test_api,test_model,test_evaluation}.py
-Dockerfile
-pyproject.toml
-.env.example
-.gitignore
-.dockerignore
-```
+The organization-scoped routes are `/v1/organizations/{organization_id}/tickets`,
+`/tickets/{ticket_id}/classify`, `/tickets/{ticket_id}/suggest`,
+`/knowledge/search`, `/dashboard/summary`,
+`/tickets/{ticket_id}/automations`, `/automations/{request_id}/approve`,
+and `/tickets/{ticket_id}/audit`. The standalone `/v1/predict` endpoint also
+requires a signed bearer token.
 
-## API routes
+Run `ruff check .`, `pytest -q`, and `alembic upgrade head`. Tests use
+cryptographically signed local RSA test tokens; no production authentication bypass.
 
-- `GET /health/live`: process liveness
-- `GET /health/ready`: model readiness (startup fails if model missing)
-- `POST /v1/predict`: JSON `{"text":"VPN disconnects at home"}`
+## Database migration warning
 
-## Security and deployment notes
+Migration `0001_secure_tenants` is a **new-install schema**. Back up any Week 3
+SQLite database before upgrading; it has a different schema and requires an
+explicit data conversion plan. Never point Alembic at an existing SQLite database
+containing unscoped tickets and assume it will upgrade in place.
 
-Never load untrusted `.joblib` files: joblib uses pickle and can execute code when deserializing. This starter API has **no authentication, rate limiting, or production-grade observability**; keep it private until those are added. Do not submit real employee data to the demo without proper authorization and redaction. For Azure, build and test the container locally before deploying to Azure Container Apps with a controlled budget.
+## Azure and the $200 credit
 
-## Next milestone
+Keep training local. Use local Docker PostgreSQL for development and do not
+provision Azure PostgreSQL or Azure OpenAI until needed. Prefer Container Apps
+with scale-to-zero where supported, set cost alerts and cap AI usage. Azure
+budget alerts are **not** hard spending limits. Production requires managed
+secrets, TLS, migrations run as one deployment job, backups, monitoring and
+rate limits. The included Docker entrypoint runs migrations on startup and is
+for a single-instance development deployment, not concurrent production replicas.
 
-Improve the dataset and evaluation to avoid near-duplicate leakage, add an authenticated API, model versioning and monitoring, then deploy a private Azure Container App.
+## Remaining limitations
 
-## Week 2 evaluation
-
-Run `python scripts/validate_data.py` and `python scripts/evaluate.py`. The report `artifacts/evaluation_v2.json` contains the family-disjoint split, model comparison, per-class metrics, confusion matrices, model version, timestamp and SHA256 digests. CI uploads this report as a short-lived artifact. The deployed model remains logistic regression for API compatibility; Linear SVM is evaluated only. These synthetic data results do not establish production quality. Real-world datasets and calibrated confidence require separate work.
-
-## IT Operations Copilot — backend MVP (follow-up PR)
-
-The MVP adds API-key-protected ticket management, assignment, priority and status updates, a
-summary endpoint, local TF-IDF document retrieval, optional Azure OpenAI suggestions, and
-**approval recording only** for allowlisted playbooks. No script execution or external ITSM
-integration is implemented. No frontend is included.
-
-Local PowerShell after installing dependencies and training:
-
-```powershell
-$env:COPILOT_API_KEY = "replace-with-a-long-random-secret"
-$env:DATABASE_URL = "sqlite:///./copilot.db"
-.\.venv\Scripts\python.exe -m uvicorn it_ai_copilot.api:app --reload
-$headers = @{ "x-api-key" = $env:COPILOT_API_KEY }
-$body = @{ title = "VPN issue"; description = "VPN disconnects frequently"; priority = "high" } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/v1/tickets -Headers $headers -ContentType "application/json" -Body $body
-Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/dashboard/summary -Headers $headers
-```
-
-Endpoints: `POST/GET /v1/tickets`, `GET/PATCH /v1/tickets/{id}`,
-`POST /v1/tickets/{id}/classify`, `POST /v1/tickets/{id}/suggest`,
-`GET /v1/knowledge/search?q=...`, `GET /v1/dashboard/summary`,
-`POST /v1/tickets/{id}/automations`, `POST /v1/automations/{id}/approve`,
-`GET /v1/tickets/{id}/audit`.
-
-To enable Azure OpenAI, configure endpoint, deployment, and API key as environment variables.
-Keep secrets out of Git. The cloud call is optional; without configuration, the assistant
-returns a local retrieval fallback. Retrieved sources are examples, not verified operational policy.
-
-**Security limitations:** Single shared API key, no real user identity, no roles or tenants,
-no separate approver verification, no database migrations, no API rate limits, no document
-access control, no metrics for true classification accuracy, and no deployment configured.
-Approval is a database state transition and can be performed with the same API key used to
-request it. **Never expose this demo publicly or use it to run changes on real systems.**
-The dashboard is a JSON summary API, not a web UI. Before production: implement
-OIDC/SSO, per-tenant authorization, two-person approval, immutable audit infrastructure,
-Alembic migrations, encrypted managed database, observability and retention controls.
+No frontend or login redirect flow, membership administration UI, tenant-aware
+private document ingestion, user-level audit immutability, rate limits, migration
+from old SQLite data, or real automation execution. This is not yet production-ready.
