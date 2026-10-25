@@ -4,12 +4,11 @@ Development auth is a single API key, not tenant-aware identity. Do not expose p
 """
 from __future__ import annotations
 
-from typing import Annotated
-
 import hmac
 import os
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, Field
