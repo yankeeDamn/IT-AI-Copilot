@@ -4,13 +4,16 @@ from __future__ import annotations
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Annotated
 
 import joblib
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from it_ai_copilot.model import LABELS
 from it_ai_copilot.operations import router as operations_router
+from it_ai_copilot.security import verified_subject
 
 
 class TicketRequest(BaseModel):
@@ -38,7 +41,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="IT AI Copilot", version="0.3.0", lifespan=lifespan)
+app = FastAPI(title="IT AI Copilot", version="0.4.0", lifespan=lifespan)
 
 
 app.include_router(operations_router)
@@ -54,8 +57,17 @@ def ready():
     return {"status": "ready"}
 
 
+predict_bearer = HTTPBearer(auto_error=False)
+
+
+def authorized_prediction(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(predict_bearer)]):
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Bearer token required")
+    return verified_subject(credentials.credentials)
+
+
 @app.post("/v1/predict", response_model=PredictionResponse)
-def predict(ticket: TicketRequest):
+def predict(ticket: TicketRequest, subject: Annotated[str, Depends(authorized_prediction)]):
     if not ticket.text.strip():
         raise HTTPException(status_code=422, detail="Ticket text cannot be blank")
     model = app.state.model
