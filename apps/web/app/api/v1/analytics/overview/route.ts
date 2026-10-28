@@ -10,14 +10,14 @@ export async function GET() {
   try {
     const ctx = await requireContext("reports.view");
     const where = { organizationId: ctx.organizationId, deletedAt: null };
-    const [total, open, critical, resolved, assets, breakdown] = await prisma.$transaction([
+    const [total, open, critical, resolved, assets] = await prisma.$transaction([
       prisma.ticket.count({ where }),
       prisma.ticket.count({ where: { ...where, status: { in: ["OPEN", "ASSIGNED", "IN_PROGRESS", "PENDING"] } } }),
       prisma.ticket.count({ where: { ...where, priority: "CRITICAL", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
       prisma.ticket.count({ where: { ...where, status: { in: ["RESOLVED", "CLOSED"] } } }),
-      prisma.asset.count({ where: { organizationId: ctx.organizationId, deletedAt: null } }),
-      prisma.ticket.groupBy({ by: ["status"], where, _count: { _all: true } })
+      prisma.asset.count({ where: { organizationId: ctx.organizationId, deletedAt: null } })
     ]);
+    const breakdown = await prisma.ticket.groupBy({ by: ["status"], orderBy: { status: "asc" }, where, _count: { _all: true } });
     return NextResponse.json({
       data: {
         total, open, critical, resolved, assets,
