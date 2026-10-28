@@ -12,7 +12,7 @@ export default function SignInPage() {
         <div>
           <div className="text-sm font-bold text-blue-600">IT-AI-Copilot</div>
           <h1 className="mt-2 text-2xl font-bold">Welcome back</h1>
-          <p className="mt-2 text-sm muted">Sign in with your organization's managed identity. MFA enforcement is configured by your identity provider.</p>
+          <p className="mt-2 text-sm muted">Sign in with your organization&apos;s managed identity. MFA enforcement is configured by your identity provider.</p>
         </div>
         <form action={async () => { "use server"; await signIn("microsoft-entra-id", { redirectTo: "/dashboard" }); }}>
           <Button type="submit" className="w-full">Continue with Microsoft Entra ID</Button>
