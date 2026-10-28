@@ -13,14 +13,14 @@ export default async function Dashboard() {
   const scope = {
     organizationId: ctx.organizationId, deletedAt: null, ...ticketVisibility(ctx)
   };
-  const [total, open, critical, resolved, assets, breakdown] = await prisma.$transaction([
+  const [total, open, critical, resolved, assets] = await prisma.$transaction([
     prisma.ticket.count({ where: scope }),
     prisma.ticket.count({ where: { ...scope, status: { in: ["OPEN", "ASSIGNED", "IN_PROGRESS", "PENDING"] } } }),
     prisma.ticket.count({ where: { ...scope, priority: "CRITICAL", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
     prisma.ticket.count({ where: { ...scope, status: { in: ["RESOLVED", "CLOSED"] } } }),
-    prisma.asset.count({ where: { organizationId: ctx.organizationId, deletedAt: null } }),
-    prisma.ticket.groupBy({ by: ["status"], orderBy: { status: "asc" }, where: scope, _count: { _all: true } })
+    prisma.asset.count({ where: { organizationId: ctx.organizationId, deletedAt: null } })
   ]);
+  const breakdown = await prisma.ticket.groupBy({ by: ["status"], orderBy: { status: "asc" }, where: scope, _count: { _all: true } });
   const cards = [
     { label: "Total tickets", value: total, icon: Ticket },
     { label: "Open tickets", value: open, icon: Activity },
