@@ -19,7 +19,7 @@ export default async function Dashboard() {
     prisma.ticket.count({ where: { ...scope, priority: "CRITICAL", status: { notIn: ["RESOLVED", "CLOSED"] } } }),
     prisma.ticket.count({ where: { ...scope, status: { in: ["RESOLVED", "CLOSED"] } } }),
     prisma.asset.count({ where: { organizationId: ctx.organizationId, deletedAt: null } }),
-    prisma.ticket.groupBy({ by: ["status"], where: scope, _count: { _all: true } })
+    prisma.ticket.groupBy({ by: ["status"], orderBy: { status: "asc" }, where: scope, _count: { _all: true } })
   ]);
   const cards = [
     { label: "Total tickets", value: total, icon: Ticket },
