@@ -4,6 +4,7 @@ type HttpClient = (input: string | URL, init?: RequestInit) => Promise<Response>
 
 const paths: { method: BridgeMethod; pattern: RegExp }[] = [
   { method: "GET", pattern: /^\/v1\/organizations\/[1-9]\d{0,8}\/me$/ },
+  { method: "GET", pattern: /^\/v1\/organizations\/[1-9]\d{0,8}\/automations$/ },
   { method: "GET", pattern: /^\/v1\/organizations\/[1-9]\d{0,8}\/tickets$/ },
   { method: "POST", pattern: /^\/v1\/organizations\/[1-9]\d{0,8}\/tickets$/ },
   { method: "GET", pattern: /^\/v1\/organizations\/[1-9]\d{0,8}\/tickets\/\d+$/ },
