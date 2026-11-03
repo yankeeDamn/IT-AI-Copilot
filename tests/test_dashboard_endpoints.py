@@ -3,7 +3,10 @@ from it_ai_copilot.operations import router
 
 
 def test_dashboard_routes_are_tenant_scoped():
-    mapping = {getattr(route, "path", None): getattr(route, "methods", set()) for route in router.routes}
+    mapping = {}
+    for route in router.routes:
+        path = getattr(route, "path", None)
+        mapping.setdefault(path, set()).update(getattr(route, "methods", set()))
     base = "/v1/organizations/{organization_id}"
     assert "GET" in mapping[base + "/me"]
     assert "GET" in mapping[base + "/automations"]
