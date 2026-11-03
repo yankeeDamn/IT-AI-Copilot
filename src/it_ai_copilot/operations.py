@@ -84,6 +84,27 @@ def serialize(ticket: Ticket) -> dict:
     }
 
 
+@router.get("/me")
+def current_membership(who: Who):
+    """Return the role from trusted database membership, never from the browser."""
+    return {"subject": who.subject, "organization_id": who.organization_id, "role": who.role}
+
+
+@router.get("/automations")
+def list_automation_requests(who: Who, session: Database):
+    """Admin approval inbox, restricted to the current organization."""
+    require_role(who, "admin")
+    requests = session.scalars(select(AutomationRequest).where(
+        AutomationRequest.organization_id == who.organization_id,
+    ).order_by(AutomationRequest.id.desc()).limit(100)).all()
+    return [{
+        "id": item.id, "ticket_id": item.ticket_id, "playbook": item.playbook,
+        "status": item.status, "requested_by": item.requested_by,
+        "reviewed_by": item.reviewed_by,
+        "can_approve": item.status == "pending" and item.requested_by != who.subject,
+    } for item in requests]
+
+
 @router.post("/tickets", status_code=201)
 def create_ticket(payload: TicketCreate, who: Who, session: Database):
     require_role(who, "technician", "admin")
