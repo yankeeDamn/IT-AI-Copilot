@@ -1,0 +1,39 @@
+name: Frontend
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "src/it_ai_copilot/operations.py"
+      - "tests/test_security.py"
+      - ".github/workflows/frontend.yml"
+  push:
+    paths:
+      - "frontend/**"
+      - "src/it_ai_copilot/operations.py"
+      - "tests/test_security.py"
+      - ".github/workflows/frontend.yml"
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      AUTH_SECRET: frontend-ci-not-a-production-secret-1234567890
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run API bridge authorization tests
+        run: npm test
+      - name: Compile frontend
+        run: npm run build
+      - name: TypeScript validation
+        run: npm run typecheck
