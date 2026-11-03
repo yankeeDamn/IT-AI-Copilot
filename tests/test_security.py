@@ -109,3 +109,35 @@ def test_unsigned_or_wrong_audience_rejected(secured_client):
         "iss": "https://id.example.test", "aud": "wrong", "sub": "alice",
         "iat": datetime.now(UTC), "exp": datetime.now(UTC) + timedelta(minutes=5),
     }, "secret", algorithm="HS256")}).status_code == 401
+
+
+def test_dashboard_membership_and_approval_inbox_scoping(secured_client):
+    client, token, org, other = secured_client
+    base = f"/v1/organizations/{org}"
+    me = client.get(base + "/me", headers=token("alice"))
+    assert me.status_code == 200
+    assert me.json()["role"] == "technician"
+    assert me.json()["organization_id"] == org
+    assert client.get(base + "/me", headers=token("mallory")).status_code == 403
+
+    assert client.get(base + "/automations", headers=token("alice")).status_code == 403
+    assert client.get(base + "/automations", headers=token("viewer")).status_code == 403
+    assert client.get(base + "/automations", headers=token("bob")).json() == []
+
+    create = client.post(base + "/tickets", headers=token("alice"), json={
+        "title": "Cannot authenticate", "description": "Employee cannot sign into account"
+    })
+    assert create.status_code == 201
+    ticket_id = create.json()["id"]
+    requested = client.post(base + f"/tickets/{ticket_id}/automations",
+                            headers=token("alice"), json={"playbook": "collect_diagnostics"})
+    assert requested.status_code == 201
+    items = client.get(base + "/automations", headers=token("bob")).json()
+    assert len(items) == 1
+    assert items[0]["status"] == "pending"
+    assert items[0]["can_approve"] is True
+    assert items[0]["requested_by"] == "https://id.example.test|alice"
+    assert client.get(f"/v1/organizations/{other}/automations",
+                      headers=token("mallory")).json() == []
+    assert client.get(f"/v1/organizations/{other}/automations",
+                      headers=token("bob")).status_code == 403
