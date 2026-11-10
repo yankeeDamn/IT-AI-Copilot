@@ -1,0 +1,55 @@
+name: Enterprise Web Foundation
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "docs/architecture/**"
+      - ".github/workflows/enterprise-web.yml"
+  push:
+    branches:
+      - "feature/phase5-enterprise-platform-foundation"
+    paths:
+      - "apps/web/**"
+      - "docs/architecture/**"
+      - ".github/workflows/enterprise-web.yml"
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      ITSM_DATABASE_URL: postgresql://copilot:development-only@localhost:5432/copilot?schema=itsm
+      AUTH_SECRET: github-actions-test-secret-at-least-32-characters-long
+      AUTH_URL: http://localhost:3000
+      APP_ORIGIN: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install web dependencies
+        run: npm install --no-audit --no-fund
+      - name: Prisma validation
+        run: npx prisma validate
+      - name: Prisma generate
+        run: npx prisma generate
+      - name: TypeScript check
+        run: npm run typecheck
+      - name: Contract tests
+        run: npm test
+      - name: Lint
+        run: npm run lint
+      - name: Production bundle smoke test
+        run: npm run build
+      - name: Produce schema migration draft for later review
+        run: |
+          npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma-initial-review.sql
+      - name: Upload migration draft
+        uses: actions/upload-artifact@v4
+        with:
+          name: itsm-prisma-initial-migration-review
+          path: apps/web/prisma-initial-review.sql
+          retention-days: 5
